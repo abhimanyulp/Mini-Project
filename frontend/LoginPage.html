@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        #nav-container {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: whitesmoke;
+        }
+
+        #nav-box {
+            width: 70%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        #nav-fix {
+            width: 50%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-dynamic {
+            width: 50%;
+            display: flex;
+            justify-content: space-around;
+            /* display: none; */
+        }
+
+        #nav-dynamic-2 {
+            align-items: center;
+            display: none;
+            /* display: flex; */
+        }
+
+        #logout-btn {
+            width: 100px;
+            height: 40px;
+        }
+
+        #form-container {
+            width: 100%;
+            height: 70vh;
+            flex-direction: column;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #heading {
+            width: 200px;
+            height: 60px;
+            text-align: center;
+            padding-bottom: 50px;
+            /* border: 2px solid red; */
+        }
+
+        #form-container>form {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            /* border: 2px solid red; */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-container">
+        <div id="nav-box">
+            <div id="nav-fix">
+                <a href="index.html">Home</a>
+                <a href="./AboutPage.html">About</a>
+            </div>
+            <div id="nav-dynamic-1" class="nav-dynamic">
+                <a href="./SignupPage.html">Sign-up</a>
+                <a href=#>Login</a>
+            </div>
+            <div id="nav-dynamic-2" class="nav-dynamic">
+                <button id="logout-btn">Logout</button>
+                <h2 id="username-display"></h2>
+            </div>
+        </div>
+    </div>
+    <div id="form-container">
+        <div id="heading">
+            <h1>Login</h1>
+        </div>
+        <form action="">
+            <input type="text" placeholder="Email" id="emailIn">
+            <input type="password" placeholder="Password" id="passwordIn">
+            <button id="submitbtn">Submit</button>
+        </form>
+    </div>
+</body>
+<script>
+
+
+    const baseServerURL = `https://teal-crowded-mackerel.cyclic.app`;
+
+
+
+
+
+    // <----------------Catching the Elements----------------->
+
+    let emailIn = document.getElementById("emailIn");
+    let passwordIn = document.getElementById("passwordIn");
+    let submitBtn = document.getElementById("submitbtn");
+
+    let lsData = localStorage.getItem("email")
+
+    let nav_1 = document.getElementById("nav-dynamic-1")
+    let nav_2 = document.getElementById("nav-dynamic-2")
+    let username_display = document.getElementById("username-display")
+
+    let logoutBtn = document.getElementById("logout-btn");
+
+
+
+
+
+
+
+
+    //<----------------------Event Listeners--------------------->
+
+
+    window.addEventListener("load", (e) => {
+
+        if (lsData) {
+            nav_1.style.display = "none";
+            nav_2.style.display = "flex";
+            username_display.innerText = lsData;
+        }
+    })
+
+
+    logoutBtn.addEventListener("click", (e) => {
+        localStorage.setItem("email", "")
+        localStorage.setItem("localAccessToken", "")
+        location.reload()
+    })
+
+
+
+    submitBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        let userObj = {
+            email: emailIn.value,
+            pass: passwordIn.value
+        }
+
+        if (validate(userObj)) {
+
+            fetch(`${baseServerURL}/users/login`, {
+                method: "POST",
+                body: JSON.stringify(userObj),
+                headers: {
+                    'Content-type': 'application/json'
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+
+                    if (data.email) {
+                        localStorage.setItem("email", data.email)
+                        localStorage.setItem("localAccessToken", data.token);
+                        alert(data.msg)
+                        window.location.href = "./index.html"
+                    } else {
+                        alert(data.msg)
+                    }
+
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    })
+
+
+
+    // <-------------Functions---------------->
+
+    function validate(obj) {
+
+        if (obj.username == "" || obj.password == "") {
+            alert("Please Fill The Form")
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+</script>
+
+</html>

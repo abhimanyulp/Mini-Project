@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif
+        }
+
+        #nav-container {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: whitesmoke;
+        }
+
+        #nav-box {
+            width: 70%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        #nav-fix {
+            width: 50%;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-dynamic {
+            width: 50%;
+            display: flex;
+            justify-content: space-around;
+            /* display: none; */
+        }
+
+        #nav-dynamic-2 {
+            align-items: center;
+            display: none;
+            /* display: flex; */
+        }
+
+        #logout-btn {
+            width: 100px;
+            height: 40px;
+        }
+
+        #welcome-container {
+            width: 100%;
+        }
+
+        #welcome-container>img {
+            width: 100%;
+        }
+
+        #display-container {
+            display: none;
+        }
+
+        #display-options {
+            width: 30%;
+            display: flex;
+            flex-direction: column;
+            /* justify-content: space-around; */
+            align-items: center;
+            padding: 50px 0px;
+            background-color: snow
+        }
+
+        #submitbtn-get {
+            width: 100%;
+        }
+
+        #display-options>div>form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #display {
+            width: 100%;
+        }
+
+        #display>table {
+            width: 100%;
+            margin: auto;
+        }
+
+        #display>table>thead {
+            background-color: snow;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-container">
+        <div id="nav-box">
+            <div id="nav-fix">
+                <a href=#>Home</a>
+                <a href="./AboutPage.html">About</a>
+            </div>
+            <div id="nav-dynamic-1" class="nav-dynamic">
+                <a href="./SignupPage.html">Sign-up</a>
+                <a href="./LoginPage.html">Login</a>
+            </div>
+            <div id="nav-dynamic-2" class="nav-dynamic">
+                <button id="logout-btn">Logout</button>
+                <h2 id="username-display"></h2>
+            </div>
+        </div>
+    </div>
+    <div id="welcome-container">
+        <img src="./img/welcome.png" alt="error">
+    </div>
+    <div id="display-container">
+        <div id="display-options">
+            <div id="getnotes">
+                <h1>Get Notes</h1>
+                <button id="submitbtn-get">Submit</button>
+            </div>
+            <div id="addnote">
+                <h1>Add Note</h1>
+                <form action="">
+                    <input type="text" placeholder="Title" id="title-add">
+                    <input type="text" placeholder="Please Enter Note" id="body-add">
+                    <input type="text" placeholder="Subject" id="sub-add">
+                    <button id="submitbtn-add">Submit</button>
+                </form>
+
+            </div>
+            <div id="deletenote">
+                <h1>Delete Note</h1>
+                <form action="">
+                    <input type="text" placeholder="Note-Id" id="noteid-delete">
+                    <button id="submitbtn-delete">Submit</button>
+                </form>
+            </div>
+            <div id="updatenote">
+                <h1>Update Note</h1>
+                <form action="">
+                    <input type="text" placeholder="Title" id="title-update">
+                    <input type="text" placeholder="Please Enter Note" id="body-update">
+                    <input type="text" placeholder="Subject" id="sub-update">
+                    <input type="text" placeholder="Note-Id" id="noteid-update">
+                    <button id="submitbtn-update">Submit</button>
+                </form>
+            </div>
+        </div>
+        <div id="display">
+            <table>
+                <thead>
+                    <tr>
+                        <td>ID</td>
+                        <th>Title</th>
+                        <th>Body</th>
+                        <th>Subject</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- append all the user(s) -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+<script>
+
+    const baseServerURL = `https://teal-crowded-mackerel.cyclic.app`;
+
+
+
+
+    // <----------------Catching the Elements----------------->
+
+    //Local storage
+    let userAuthToken = localStorage.getItem("localAccessToken") || null;
+    let lsData = localStorage.getItem("email");
+
+    //Navbar elements
+    let nav_1 = document.getElementById("nav-dynamic-1");
+    let nav_2 = document.getElementById("nav-dynamic-2");
+    let username_display = document.getElementById("username-display");
+    let logoutBtn = document.getElementById("logout-btn");
+
+
+    //Get
+    let submitBtn_get = document.getElementById("submitbtn-get");
+
+    //Add
+    let title_add = document.getElementById("title-add");
+    let body_add = document.getElementById("body-add");
+    let sub_add = document.getElementById("sub-add");
+    let submitBtn_add = document.getElementById("submitbtn-add");
+    
+    //Delete
+    let noteid_delete = document.getElementById("noteid-delete");
+    let submitBtn_delete = document.getElementById("submitbtn-delete");
+    
+    //Update
+    let title_update = document.getElementById("title-update");
+    let body_update = document.getElementById("body-update");
+    let sub_update = document.getElementById("sub-update");
+    let noteid_update = document.getElementById("noteid-update")
+    let submitbtn_update = document.getElementById("submitbtn-update");
+
+    let welcome_container = document.getElementById("welcome-container");
+    let display_container = document.getElementById("display-container");
+
+    let tbodyEl = document.querySelector("tbody");
+
+
+
+
+
+    //<----------------------Event Listeners--------------------->
+
+
+    //Navbar dynamic elements
+    window.addEventListener("load", (e) => {
+
+        if (lsData) {
+            nav_1.style.display = "none";
+            nav_2.style.display = "flex";
+            username_display.innerText = lsData;
+
+            welcome_container.style.display = "none";
+            display_container.style.display = "flex";
+        }
+    })
+
+
+    logoutBtn.addEventListener("click", (e) => {
+        localStorage.setItem("email", "")
+        localStorage.setItem("localAccessToken", "")
+
+        location.reload()
+    })
+
+
+
+
+    //Fetching Notes
+    submitBtn_get.addEventListener("click", (e) => {
+
+        e.preventDefault();
+
+        fetch(`${baseServerURL}/notes/`, {
+            method: "GET",
+            headers: {
+                'Content-type': 'application/json',
+                "Authorization": `Bearer ${userAuthToken}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                Display(data)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
+
+
+    //Add Note
+    submitBtn_add.addEventListener("click", (e) => {
+        e.preventDefault();
+
+
+        let noteObj = {
+            title: title_add.value,
+            body: body_add.value,
+            sub: sub_add.value
+        }
+
+
+        fetch(`${baseServerURL}/notes/add`, {
+            method: "POST",
+            body: JSON.stringify(noteObj),
+            headers: {
+                'Content-type': 'application/json',
+                "Authorization": `Bearer ${userAuthToken}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.msg)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
+
+
+
+    //Delete particular note
+    submitBtn_delete.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        fetch(`${baseServerURL}/notes/delete/${noteid_delete.value}`, {
+            method: "DELETE",
+            headers: {
+                'Content-type': 'application/json',
+                "Authorization": `Bearer ${userAuthToken}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.msg);
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
+
+
+
+    //Update Note
+    submitbtn_update.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        let userObj = {
+            title: title_update.value,
+            body: body_update.value,
+            sub: sub_update.value
+        }
+
+        fetch(`${baseServerURL}/notes/update/${noteid_update.value}`, {
+            method: "PATCH",
+            body: JSON.stringify(userObj),
+            headers: {
+                'Content-type': 'application/json',
+                "Authorization": `Bearer ${userAuthToken}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.msg);
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
+
+
+
+
+
+    // <-------------------Functions------------------>
+
+
+
+    function Display(data) {
+
+        tbodyEl.innerHTML = null;
+
+        data.forEach((element, index) => {
+            let tr = document.createElement("tr");
+
+            let td1 = document.createElement("td");
+            let td2 = document.createElement("td");
+            let td3 = document.createElement("td");
+            let td4 = document.createElement("td");
+
+
+            td1.innerText = element._id;
+            td2.innerText = element.title;
+            td3.innerText = element.body;
+            td4.innerText = element.sub;
+
+
+            tr.append(td1, td2, td3, td4);
+            tbodyEl.append(tr);
+        })
+
+    }
+
+
+
+</script>
+
+</html>
