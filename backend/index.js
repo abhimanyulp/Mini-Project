@@ -11,12 +11,19 @@ app.use(express.json());
 app.use(cors());
 
 
+app.get("/",(req,res) => {
+
+    res.send("Welcome to Home Route")
+})
+
 app.use("/users", userRouter);
 app.use(auth);
 app.use("/notes", noteRouter)
 
 
-app.listen(process.env.port, async () => {
+const Port = process.env.port || 4400
+
+app.listen(Port, async () => {
     try {
         await connection;
         console.log("Connected to MongoDB");
@@ -24,5 +31,5 @@ app.listen(process.env.port, async () => {
         console.log("Not able to connect to MongoDB");
         console.log(err);
     }
-    console.log(`Server is running at port ${process.env.port}`);
+    console.log(`Server is running at port ${Port}`);
 })

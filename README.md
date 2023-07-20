@@ -1,1 +1,2 @@
-# full_stack_mini_project
+# Note Management App
+"Note Management App is a user-friendly Express application designed to help you organize and manage your notes effortlessly. Create, edit, and delete notes with ease, ensuring your thoughts are always neatly sorted and accessible at your fingertips."
